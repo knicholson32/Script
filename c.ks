@@ -1,14 +1,16 @@
-CORE:PART:GETMODULE("kOSProcessor"):DOEVENT("Open Terminal").
-CLEARSCREEN.
+
 
 
 LOCK THROTTLE TO 0.15.   // 1.0 is the max, 0.0 is idle.
 
+SET STARTTIME TO TIME:SECONDS.
+
+//10,324.621166284 for full
 
 
-
-SET ORBITHEIGHT TO 2500000.//((Kerbin:ROTATIONPERIOD/(2*constant:pi))^2*(constant:G * Kerbin:Mass))^(1/3).
+SET ORBITHEIGHT TO 1750000.//2500000.//((Kerbin:ROTATIONPERIOD/(2*constant:pi))^2*(constant:G * Kerbin:Mass))^(1/3).
 PRINT "Orbit: " + ORBITHEIGHT.
+PRINT "START: " + STARTTIME.
 SET PLANE TO 90. //East
 SET deg TO 90.
 SET STEER TO HEADING(PLANE,deg).
@@ -56,6 +58,8 @@ until ship:APOAPSIS >= ORBITHEIGHT {
   PRINT "Semi-major A: "+SHIP:ORBIT:SEMIMAJORAXIS AT (0,22).
   PRINT "Semi-minor A: "+SHIP:ORBIT:SEMIMINORAXIS AT (0,23).
   PRINT "Solid:        "+SHIP:solidfuel AT (0,24).
+  print "Time:         "+TIME:SECONDS AT (0,25).
+  print "OLDTime:      "+STARTTIME AT (0,26).
   //PRINT "ETA Apoapsis: "+SHIP:ORBIT:ETA:APOAPSIS AT (0,24).
 
   SET STEER to HEADING(PLANE,deg).
@@ -72,6 +76,7 @@ LOCK THROTTLE TO 0.01.
 wait 0.5.
 LOCK THROTTLE TO 0.0.
 ag1 on.
+RCS ON.
 print "Waiting for circle burn".
 
 set alti to ORBITHEIGHT.
@@ -94,6 +99,7 @@ local v2 is sqrt( vom^2 + (mu * (2/r2 - 2/r + 1/sma1 - 1/sma2 ) ) ).
 // create node
 local deltav is v2 - v1.
 local nd is node(time:seconds + eta:apoapsis, 0, 0, deltav).
+print "TIME: " + (time:seconds + eta:apoapsis).
 add nd.
 wait 5.
 run node.
@@ -146,6 +152,7 @@ until state {
   local deltav is v2 - v1.
   local nd is node(time:seconds + eta:periapsis, 0, 0, deltav).
   add nd.
+  wait 5.
   run node.
   print SHIP:ORBIT:ECCENTRICITY.
   if abs(periapsis - ORBITHEIGHT) < 2500 AND abs(apoapsis - ORBITHEIGHT) < 2500  {
@@ -156,6 +163,8 @@ until state {
 
 
 PRINT "100km apoapsis reached, cutting throttle".
+print "Time:         "+TIME:SECONDS.
+print "OLDTime:      "+STARTTIME.
 
 LOCK THROTTLE TO 0.
 

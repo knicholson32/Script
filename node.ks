@@ -25,7 +25,7 @@ global nodeDob is (nodeNd:deltav:mag / nodeAccel).
 
 uiDebug("Orient to burn").
 wait until vdot(facing:forevector, nodeFacing:forevector) >= 0.995 or nodeNd:eta <= nodeDob / 2.
-
+wait 2.
 // warp to burn time; give 3 seconds slack for final steering adjustments
 global nodeHang is (nodeNd:eta - nodeDob/2) - 3.
 if nodeHang > 0 {
