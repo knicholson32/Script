@@ -3,9 +3,10 @@
 /////////////////////////////////////////////////////////////////////////////
 // Execute a maneuver node, warping if necessary to save time.
 /////////////////////////////////////////////////////////////////////////////
-
-run lib_ui.
-
+parameter name is "NONE".
+if name = "NONE"{
+  run lib_ui.
+}
 // quo vadis?
 global nodeNd is nextnode.
 
@@ -23,8 +24,12 @@ global nodeAccel is uiAssertAccel("Node").
 global nodeFacing is lookdirup(nodeNd:deltav, ship:facing:topvector).
 global nodeDob is (nodeNd:deltav:mag / nodeAccel).
 
-uiDebug("Orient to burn").
-wait until vdot(facing:forevector, nodeFacing:forevector) >= 0.995 or nodeNd:eta <= nodeDob / 2.
+if name = "NONE"{
+  uiDebug("Orient to burn").
+}else{
+  uiConsole(name,"Orient to burn").
+}
+wait until vdot(facing:forevector, nodeFacing:forevector) >= 0.995.// or nodeNd:eta <= nodeDob / 2.
 wait 2.
 // warp to burn time; give 3 seconds slack for final steering adjustments
 global nodeHang is (nodeNd:eta - nodeDob/2) - 3.
@@ -33,11 +38,17 @@ if nodeHang > 0 {
   wait 3.
 }
 
+//global nodeFacing is lookdirup(nodeNd:deltav, ship:facing:topvector).
+//wait until vdot(facing:forevector, nodeFacing:forevector) >= 0.995.// or nodeNd:eta <= nodeDob / 2.
+
 global nodeDone  is false.
 global nodeDv0   is nodeNd:deltav.
 global nodeDvMin is nodeDv0:mag.
-
-uiDebug("Begin burn").
+if name = "NONE"{
+  uiDebug("Begin burn").
+}else{
+  uiConsole(name,"Begin burn").
+}
 
 until nodeDone
 {
@@ -76,7 +87,11 @@ unlock steering.
 
 // Make fine adjustments using RCS (for up to 15 seconds)
 if nodeNd:deltav:mag > 0.1 {
-  uiDebug("Fine tune with RCS").
+  if name = "NONE"{
+    uiDebug("Fine tune with RCS").
+  }else{
+    uiConsole(name,"Fine tune with RCS").
+  }
   rcs on.
   local t0 is time.
   until nodeNd:deltav:mag < 0.1 or (time - t0):seconds > 15 {
